@@ -1,0 +1,25 @@
+---
+#info: Execute an HP iLO XML script and writes a log file
+- name: Run HPiLO script {{ hpilo_script }}
+  connection: local
+  shell: hpilo {{ hpilo_host }} {{ hpilo_user }} {{ hpilo_password }} {{ hpilo_script }} "{{ hpilo_find }}" {{ hpilo_uniq }}
+  register: shell
+  async: '{{ hpilo_runner_timeout }}'
+  poll: 0
+  throttle: 20
+  become: false
+
+- name: Check on an async task
+  connection: local
+  async_status:
+    jid: '{{ shell.ansible_job_id }}'
+  register: job
+  until: job.finished
+  retries: 1000
+  delay: 3
+  become: false
+
+- include_role: name=servermonkey.ww_logger
+  vars:
+    ww_log: '{{ job }}'
+    ww_logfile: "servermonkey.hpilo_{{ hpilo_script | replace('.xml', '') }}"
