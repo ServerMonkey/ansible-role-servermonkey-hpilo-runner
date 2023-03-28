@@ -2,7 +2,9 @@
 #info: Execute an HP iLO XML script and writes a log file
 - name: Run HPiLO script {{ hpilo_script }}
   connection: local
-  shell: hpilo {{ hpilo_host }} {{ hpilo_user }} {{ hpilo_password }} {{ hpilo_script }} "{{ hpilo_find }}" {{ hpilo_uniq }}
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  shell: hpilo {{ im_hpilo_host }} {{ im_hpilo_user }} {{ im_hpilo_password }} {{ hpilo_script }} "{{ hpilo_find }}" {{ hpilo_uniq }}
   register: shell
   async: '{{ hpilo_runner_timeout }}'
   poll: 0
@@ -11,6 +13,8 @@
 
 - name: Check on an async task
   connection: local
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   async_status:
     jid: '{{ shell.ansible_job_id }}'
   register: job
