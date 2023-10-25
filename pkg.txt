@@ -1,0 +1,3 @@
+Version: 0.12
+Depends: hpilo-perl-control
+Description: Manage and monitor HPiLO capable devices
